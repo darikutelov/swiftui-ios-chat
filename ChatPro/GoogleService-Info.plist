@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDpyZ_k-LRaqm0kQ7ANtakwqo_uXuqnRl4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>726826731917</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.kutelov.ChatPro</string>
+	<key>PROJECT_ID</key>
+	<string>appstuffchatpro</string>
+	<key>STORAGE_BUCKET</key>
+	<string>appstuffchatpro.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:726826731917:ios:31757b050ea342518495c4</string>
+</dict>
+</plist>

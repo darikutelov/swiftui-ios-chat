@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "colin.jpeg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
