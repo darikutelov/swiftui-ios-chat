@@ -7,34 +7,31 @@
 
 import FirebaseAuth
 import UIKit
+import SwiftUI
 
 @MainActor
-final class AuthViewModel: NSObject, ObservableObject {
+final class AuthViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
     @Published var fullname = ""
     @Published var username = ""
-    @Published var isAuthenticated = false
+    
+    @Published var hasRegistered = false
     @Published var showAlert = false
     @Published var authError: AuthError?
     @Published var isLoading = false
     
-    private let service: AuthService
+    var userManager: UserManager
     
-    init(service: AuthService) {
-        self.service = service
-        if service.userSession != nil {
-            isAuthenticated = true
-        }
+    init(userManager: UserManager) {
+        self.userManager = userManager
     }
     
     func login() async {
         isLoading = true
-        
         do {
-            try await service.login(withEmail: email, password: password)
+            try await userManager.login(email: email, password: password)
             isLoading = false
-            isAuthenticated = service.userSession != nil
         } catch {
             let authError = AuthErrorCode(rawValue: (error as NSError).code)
             self.showAlert = true
@@ -46,14 +43,13 @@ final class AuthViewModel: NSObject, ObservableObject {
     func createUser() async {
         isLoading = true
         do {
-            try await service.createUser(email: email, password: password,
+            try await userManager.createUser(email: email, password: password,
                                          username: username, fullname: fullname)
             isLoading = false
-            isAuthenticated = service.userSession != nil
+            hasRegistered = true
         } catch {
             let authErrorCode = AuthErrorCode(rawValue: (error as NSError).code)
             showAlert = true
-            isAuthenticated = false
             isLoading = false
             authError = AuthError(authErrorCode: authErrorCode ?? .userNotFound)
         }
@@ -61,7 +57,7 @@ final class AuthViewModel: NSObject, ObservableObject {
     
     func uploadProfigeImage(_ image: UIImage) async {
         do {
-            try await service.uploadUserAvatar(image)
+            try await userManager.uploadAvatar(image)
         } catch {
             showAlert = true
             authError = .unknown
@@ -69,7 +65,13 @@ final class AuthViewModel: NSObject, ObservableObject {
     }
     
     func signout() {
-        service.signout()
-        isAuthenticated = service.userSession != nil
+        email = ""
+        password = ""
+        fullname = ""
+        username = ""
+        showAlert = false
+        authError = nil
+        hasRegistered = false
+        userManager.signout()
     }
 }

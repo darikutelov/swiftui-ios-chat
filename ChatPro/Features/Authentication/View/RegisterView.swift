@@ -94,14 +94,18 @@ struct RegisterView: View {
             Alert(title: Text("Error"),
                   message: Text(viewModel.authError?.description ?? ""))
         }
-        .navigationDestination(isPresented: $viewModel.isAuthenticated) {
+        .navigationDestination(isPresented: $viewModel.hasRegistered) {
             ProfilePhotoSelectorView(viewModel: viewModel)
         }
     }
 }
 
 #Preview {
-    RegisterView(viewModel: AuthViewModel(service: AuthService()))
+    RegisterView(
+        viewModel: AuthViewModel(
+            userManager: UserManager(authService: AuthService(), userService: UserService())
+        )
+    )
 }
 
 // MARK: - Form Validation

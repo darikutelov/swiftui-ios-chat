@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject var viewModel = StatusViewModel()
-    @ObservedObject var authViewModel: AuthViewModel
+    @ObservedObject var userManager: UserManager
     
     var body: some View {
         ZStack {
@@ -38,7 +38,7 @@ struct SettingsView: View {
                 .padding()
                 
                 Button {
-                    authViewModel.signout()
+                    userManager.signout()
                 } label: {
                     Text("Sign Out")
                         .foregroundStyle(.red)
@@ -58,5 +58,7 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView(authViewModel: AuthViewModel(service: AuthService()))
+    SettingsView(
+        userManager: UserManager(authService: AuthService(), userService: UserService())
+    )
 }

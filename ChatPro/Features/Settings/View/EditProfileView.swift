@@ -9,10 +9,12 @@ import SwiftUI
 
 struct EditProfileView: View {
     @State private var fullname = "Test User 2"
+    @State private var profileImage: Image?
+    
     @ObservedObject var viewModel: StatusViewModel
+    
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage?
-    @State private var profileImage: Image?
     
     var body: some View {
         ZStack {

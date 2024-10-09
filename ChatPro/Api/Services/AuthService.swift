@@ -60,16 +60,5 @@ final class AuthService: AuthServiceProtocol {
         self.userSession = nil
         try? Auth.auth().signOut()
     }
-    
-    func uploadUserAvatar(_ image: UIImage) async throws {
-        do {
-            let profileImageUrl = try await ImageUploader.uploadImage(image: image, folderName: "avatars")
-            guard let userId = userSession?.uid else { return }
-            try await FirestoreConstants.UserCollection.document(userId).updateData(["profileImageUrl": profileImageUrl])
-        } catch {
-            print("DEBUG: Profile image failed \(error.localizedDescription)")
-            throw error
-        }
-    }
 }
 

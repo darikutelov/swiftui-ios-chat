@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @ObservedObject var authViewModel: AuthViewModel
+    @ObservedObject var userManager: UserManager
     @State private var sectedIndex = 0
     
     private var tabTitle: String {
@@ -41,7 +41,7 @@ struct MainTabView: View {
                     }
                     .tag(1)
                 
-                SettingsView(authViewModel: authViewModel)
+                SettingsView(userManager: userManager)
                     .tabItem {
                         Image(systemName: "gear")
                     }
@@ -62,5 +62,7 @@ struct MainTabView: View {
 }
 
 #Preview {
-    MainTabView(authViewModel: AuthViewModel(service: AuthService()))
+    MainTabView(
+        userManager: UserManager(authService: AuthService(), userService: UserService())
+    )
 }

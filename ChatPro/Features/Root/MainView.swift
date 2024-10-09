@@ -8,18 +8,21 @@
 import SwiftUI
 
 struct MainView: View {
-    @ObservedObject var authViewModel: AuthViewModel
+    @ObservedObject var userManager: UserManager
     
     init() {
-        authViewModel = AuthViewModel(service: AuthService())
+        userManager = UserManager(
+            authService: AuthService(),
+            userService: UserService()
+        )
     }
 
     var body: some View {
         Group {
-            if authViewModel.isAuthenticated {
-                MainTabView(authViewModel: authViewModel)
+            if userManager.currentUser == nil {
+                LoginView(userManager: userManager)
             } else {
-                LoginView(viewModel: authViewModel)
+                MainTabView(userManager: userManager)
             }
         }
     }

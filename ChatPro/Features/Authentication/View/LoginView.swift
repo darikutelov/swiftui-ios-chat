@@ -10,6 +10,10 @@ import SwiftUI
 struct LoginView: View {
     @ObservedObject var viewModel: AuthViewModel
     
+    init(userManager: UserManager) {
+        self._viewModel = ObservedObject(wrappedValue: AuthViewModel(userManager: userManager))
+    }
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -116,6 +120,10 @@ extension LoginView {
 
 
 #Preview {
-    LoginView(viewModel: AuthViewModel(service: AuthService()))
+    LoginView(
+        userManager: UserManager(
+            authService: AuthService(),
+            userService: UserService())
+        )
 }
 

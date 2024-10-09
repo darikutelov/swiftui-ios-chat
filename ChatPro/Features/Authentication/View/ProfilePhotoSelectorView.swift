@@ -75,5 +75,9 @@ struct ProfilePhotoSelectorView: View {
 }
 
 #Preview {
-    ProfilePhotoSelectorView(viewModel: AuthViewModel(service: AuthService()))
+    ProfilePhotoSelectorView(
+        viewModel: AuthViewModel(
+            userManager: UserManager(authService: AuthService(), userService: UserService())
+        )
+    )
 }
