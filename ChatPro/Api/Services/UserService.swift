@@ -25,6 +25,27 @@ final class UserService {
         }
     }
     
+    func saveUser(_ user: User) async throws {
+        guard let userId = user.id else {
+            throw NSError(domain: "UserServiceError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User ID is missing"])
+        }
+        
+        var userData: [String: String] = [
+            "fullname": user.fullname,
+        ]
+        
+        if let profileImageUrl = user.profileImageUrl {
+            userData["profileImageUrl"] = profileImageUrl
+        }
+        
+        do {
+            try await FirestoreConstants.UserCollection.document(userId).updateData(userData)
+        } catch {
+            print("DEBUG: Failed to update user: \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
     func uploadUserAvatar(_ image: UIImage, userId: String) async throws {
         do {
             let profileImageUrl = try await ImageUploader.uploadImage(image: image, folderName: "avatars")

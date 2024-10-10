@@ -12,15 +12,16 @@ struct MessageView: View {
     // For animation
     @State private var isShowing = false
     let isNewMessage: Bool
+    let isFromCurrentUser: Bool
     
     var body: some View {
         HStack {
-            if message.isFromCurrentUser {
+            if isFromCurrentUser {
                 Spacer()
                 
                 MessageText(
-                    text: message.messageText,
-                    isCurrentUser: message.isFromCurrentUser
+                    text: message.text,
+                    isCurrentUser: isFromCurrentUser
                 )
                 .padding(.leading, 40)
                 
@@ -35,8 +36,8 @@ struct MessageView: View {
                         .opacity(isShowing ? 1 : 0)
                     
                     MessageText(
-                        text: message.messageText,
-                        isCurrentUser: message.isFromCurrentUser
+                        text: message.text,
+                        isCurrentUser: isFromCurrentUser
                     )
                     .padding(.trailing, 40)
                 }
@@ -44,10 +45,12 @@ struct MessageView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 2)
-        .modifier(SlideInEffect(
-            isShowing: isNewMessage ? isShowing : true,
-            isFromCurrentUser: message.isFromCurrentUser
-        ))
+        .modifier(
+            SlideInEffect(
+                isShowing: isNewMessage ? isShowing : true,
+                isFromCurrentUser: isFromCurrentUser
+            )
+        )
         .onAppear {
             if isNewMessage {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -62,8 +65,9 @@ struct MessageView: View {
 
 #Preview {
     MessageView(
-        message: .init(isFromCurrentUser: true, messageText: "Hello, there"),
-        isNewMessage: true
+        message: MOCK_MESSAGE,
+        isNewMessage: true,
+        isFromCurrentUser: true
     )
 }
 

@@ -1,5 +1,5 @@
 //
-//  ConversationsView.swift
+//  ConversationsScreen.swift
 //  ChatPro
 //
 //  Created by Dariy Kutelov on 14.12.23.
@@ -7,14 +7,16 @@
 
 import SwiftUI
 
-struct ConversationsView: View {
+struct ConversationsScreen: View {
     @State var isShowingNewMessageView = false
     @State var showChatView = false
-    //    @State var user: User?
+    @State private var path = NavigationPath()
+    let currentUser: User?
+    @State var selectedUser: User?
     //    @ObservedObject var viewModel = ConversationsViewModel()
     //    
     var body: some View {
-        NavigationStack{
+        NavigationStack() {
             ZStack(alignment: .bottomTrailing) {
                 
                 // Chats
@@ -23,7 +25,7 @@ struct ConversationsView: View {
                         ForEach(1...15, id: \.self) { _ in
                             // TODO: - Remove Divider from the last cell
                             NavigationLink {
-                                ChatView()
+                                ChatScreen(chatToUser: selectedUser)
                             } label: {
                                 ConversationCell()
                                     .padding(.horizontal)
@@ -38,20 +40,33 @@ struct ConversationsView: View {
                 HStack {
                     Spacer()
                     FloatingButton(show: $isShowingNewMessageView)
-                        .sheet(isPresented: $isShowingNewMessageView, content: {
-                            NewMessageView(showChatView: $showChatView)
+                        .sheet(
+                            isPresented: $isShowingNewMessageView,
+                            content: {
+                                NewMessageUsersScreen(
+                                    showChatView: $showChatView,
+                                    chatToUser: $selectedUser,
+                                    currentUserId: currentUser?.id! ?? ""
+                                )
                         })
                 }
             }
             .navigationTitle("Messages")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: $showChatView) {
-                LazyView(ChatView())
+                LazyView(
+                    ChatScreen(chatToUser: selectedUser)
+                )
             }
         }
     }
 }
 
+
 #Preview {
-    ConversationsView()
+    ConversationsScreen(
+        currentUser: UserManager(
+            authService: AuthService(),
+            userService: UserService()).currentUser
+    )
 }

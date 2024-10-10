@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct EditProfileView: View {
-    @State private var fullname = "Test User 2"
+    @State private var fullname = ""
     @State private var profileImage: Image?
     
-    @ObservedObject var viewModel: StatusViewModel
+    @ObservedObject var satusViewModel: StatusViewModel
+    @ObservedObject var userManager: UserManager
     
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage?
@@ -33,7 +35,7 @@ struct EditProfileView: View {
                                     .frame(width: 64, height: 64)
                                     .clipShape(Circle())
                             }  else {
-                                Image(.wasp)
+                                KFImage(URL(string: userManager.currentUser?.profileImageUrl ?? ""))
                                     .resizable()
                                     .scaledToFill()
                                     .frame(width: 64, height: 64)
@@ -65,9 +67,14 @@ struct EditProfileView: View {
                     Divider()
                         .padding(.horizontal)
                     
-                    TextField("", text: $fullname)
+                    TextField("", text: $userManager.editableUser.fullname)
                         .bodyText(size: 16)
-                        .padding(8)
+                    
+                    Button("Save Changes") {
+                        Task {
+                            try await userManager.saveChanges()
+                        }
+                    }
                 }
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -81,10 +88,10 @@ struct EditProfileView: View {
                         .padding()
                     
                     NavigationLink {
-                        StatusSelectorView(viewModel: viewModel)
+                        StatusSelectorView(viewModel: satusViewModel)
                     } label: {
                         HStack {
-                            Text(viewModel.userStatus.title)
+                            Text(satusViewModel.userStatus.title)
                                 .bodyText(size: 16)
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -110,5 +117,11 @@ struct EditProfileView: View {
 }
 
 #Preview {
-    EditProfileView(viewModel: StatusViewModel())
+    EditProfileView(
+        satusViewModel: StatusViewModel(),
+        userManager: UserManager(
+            authService: AuthService(),
+            userService: UserService()
+        )
+    )
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject var viewModel = StatusViewModel()
+    @StateObject var satusViewModel = StatusViewModel()
     @ObservedObject var userManager: UserManager
     
     var body: some View {
@@ -18,9 +18,15 @@ struct SettingsView: View {
             
             VStack(spacing: 32) {
                 NavigationLink {
-                    EditProfileView(viewModel: viewModel)
+                    EditProfileView(
+                        satusViewModel: satusViewModel,
+                        userManager: userManager
+                    )
                 } label: {
-                    SettingsHeader(userStatus: viewModel.userStatus)
+                    SettingsHeader(
+                        userStatus: satusViewModel.userStatus,
+                        userManager: userManager
+                    )
                         .padding()
                 }
                 

@@ -7,12 +7,13 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 
 struct User: Identifiable, Codable {
-    let id: String
+    @DocumentID var id: String?
     var username: String
-    let email: String
-    let fullname: String
+    var email: String
+    var fullname: String
     var profileImageUrl: String?
  
     var isCurrentUser: Bool {
@@ -28,7 +29,7 @@ struct User: Identifiable, Codable {
         self.profileImageUrl = try container.decodeIfPresent(String.self, forKey: .profileImageUrl)
     }
     
-    init(id: String, username: String, email: String, fullname: String, bio: String? = nil, profileImageUrl: String? = nil) {
+    init(id: String, username: String, email: String, fullname: String, profileImageUrl: String? = nil) {
         self.id = id
         self.username = username
         self.email = email
@@ -36,3 +37,10 @@ struct User: Identifiable, Codable {
         self.profileImageUrl = profileImageUrl
     }
 }
+
+
+let MOCK_USER = User(id: "1234567890", 
+                     username: "sarah1999",
+                     email: "sarah.doe@example.com",
+                     fullname: "Sarah Doe", 
+                     profileImageUrl: "https://firebasestorage.googleapis.com:443/v0/b/appstuffchatpro.appspot.com/o/avatars%2F00E59A09-8E82-4CD6-8533-F1562ECE0C32?alt=media&token=b2321786-7b11-4ccd-b3ea-5b79bca4089d")

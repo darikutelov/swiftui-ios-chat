@@ -23,7 +23,7 @@ struct MainTabView: View {
     var body: some View {
         NavigationStack {
             TabView(selection: $sectedIndex) {
-                ConversationsView()
+                ConversationsScreen(currentUser: userManager.currentUser)
                     .tabItem {
                         Image(systemName: "bubble.left")
                     }

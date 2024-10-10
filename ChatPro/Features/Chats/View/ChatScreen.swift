@@ -7,16 +7,18 @@
 
 import SwiftUI
 
-struct ChatView: View {
-    //let user: User
-    @ObservedObject var vm = ChatViewModel()
+struct ChatScreen: View {
+    private let chatToUser: User?
+    @ObservedObject var viewModel = ChatViewModel()
+    @Environment(\.presentationMode) var presentationMode
+    
     @State private var messageText: String = ""
     @State private var selectedImage: UIImage?
     
-    //    init(user: User) {
-    //        self.user = user
-    //        self.viewModel = ChatViewModel(user: user)
-    //    }
+    init(chatToUser: User?) {
+        self.chatToUser = chatToUser
+        //self.viewModel = ChatViewModel(user: user)
+    }
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -25,16 +27,17 @@ struct ChatView: View {
                 ScrollViewReader { value in
                     ScrollView {
                         VStack(alignment: .leading, spacing: 12) {
-                            ForEach(vm.messages) { message in
+                            ForEach(viewModel.messages) { message in
                                 MessageView(
                                     message: message,
-                                    isNewMessage: message.id == vm.newMessageId
+                                    isNewMessage: message.id == viewModel.newMessageId,
+                                    isFromCurrentUser: true
                                 )
                                 .id(message.id)
                             }
                         }.padding(.top)
                     }
-                    .onChange(of: vm.newMessageId) { _, id in
+                    .onChange(of: viewModel.newMessageId) { _, id in
                         withAnimation {
                             proxy.scrollTo(id, anchor: .bottom)
                         }
@@ -48,19 +51,33 @@ struct ChatView: View {
                 .padding()
             }
             //.navigationTitle(user.username)
-            .navigationTitle("Barbara")
+            .navigationTitle(chatToUser?.username ?? "Chat View")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    // Custom back button
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                                .foregroundStyle(.customPrimary)
+                        }
+                    }
+                }
+            }
         }
     }
     
     func sendMessage() {
-        vm.sendMessage(messageText)
+        viewModel.sendMessage(messageText)
         messageText = ""
     }
 }
 
 #Preview {
     NavigationView {
-        ChatView(vm: ChatViewModel())
+        ChatScreen(chatToUser: MOCK_USER)
     }
 }

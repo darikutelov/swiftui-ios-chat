@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct SettingsHeader: View {
     let userStatus: UserStatus
+    @ObservedObject var userManager: UserManager
     
     var body: some View {
         HStack {
-            Image("wasp")
+            KFImage(URL(string: userManager.currentUser?.profileImageUrl ?? ""))
                 .resizable()
                 .scaledToFill()
                 .frame(width: 64, height: 64)
@@ -20,7 +22,7 @@ struct SettingsHeader: View {
                 .padding(.leading)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("Test User 2")
+                Text(userManager.currentUser?.fullname ?? "N/A")
                     .bodyText(size: 18)
                 Text(userStatus.title)
                     .bodyText(size: 14)
@@ -35,5 +37,11 @@ struct SettingsHeader: View {
 }
 
 #Preview {
-    SettingsHeader(userStatus: .available)
+    SettingsHeader(
+        userStatus: .available,
+        userManager: UserManager(
+            authService: AuthService(),
+            userService: UserService()
+        )
+    )
 }

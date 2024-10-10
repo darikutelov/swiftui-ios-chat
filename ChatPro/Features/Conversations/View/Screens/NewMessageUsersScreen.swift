@@ -7,13 +7,15 @@
 
 import SwiftUI
 
-struct NewMessageView: View {
+struct NewMessageUsersScreen: View {
+    @Environment(\.presentationMode) var mode
+    @Binding var showChatView: Bool
+    @Binding var chatToUser: User?
+    let currentUserId: String
+    
+    @ObservedObject var viewModel = NewMessageScreenViewModel()
     @State var searchText = ""
     @State var isEditing = false
-    @Binding var showChatView: Bool
-    @Environment(\.presentationMode) var mode
-    //    @Binding var user: User?
-    //    @ObservedObject var viewModel = NewMessageViewModel(config: .chat)
     
     var body: some View {
         ScrollView {
@@ -22,12 +24,13 @@ struct NewMessageView: View {
                 .padding(.bottom)
             
             VStack(alignment: .leading) {
-                ForEach(1...10, id: \.self) { _ in
+                ForEach(viewModel.users.filter {$0.id != currentUserId }) { user in
                     Button {
                         showChatView.toggle()
+                        self.chatToUser = user
                         mode.wrappedValue.dismiss()
                     } label: {
-                        UserCell()
+                        UserCell(user: user)
                     }
                 }
             }
@@ -37,7 +40,10 @@ struct NewMessageView: View {
 }
 
 #Preview {
-    NewMessageView(
-        showChatView: .constant(true)
+    NewMessageUsersScreen(
+        showChatView: .constant(true),
+        chatToUser: .constant(MOCK_USER),
+        currentUserId: "123",
+        viewModel: NewMessageScreenViewModel()
     )
 }
