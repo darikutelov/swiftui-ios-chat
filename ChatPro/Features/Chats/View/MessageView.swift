@@ -8,20 +8,25 @@
 import SwiftUI
 
 struct MessageView: View {
-    let message: Message
-    // For animation
-    @State private var isShowing = false
     let isNewMessage: Bool
-    let isFromCurrentUser: Bool
+    let currentUser: User
+    
+    @ObservedObject var viewModel: MessageViewViewModel
+    
+    init(message: Message, isNewMessage: Bool, currentUser: User) {
+        self.isNewMessage = isNewMessage
+        self.currentUser = currentUser
+        self._viewModel = ObservedObject(wrappedValue: MessageViewViewModel(message: message, currentUser: currentUser))
+    }
     
     var body: some View {
         HStack {
-            if isFromCurrentUser {
+            if viewModel.isFromCurrentUser {
                 Spacer()
                 
                 MessageText(
-                    text: message.text,
-                    isCurrentUser: isFromCurrentUser
+                    text: viewModel.message.text,
+                    isCurrentUser: viewModel.isFromCurrentUser
                 )
                 .padding(.leading, 40)
                 
@@ -32,12 +37,12 @@ struct MessageView: View {
                         .scaledToFill()
                         .frame(width: 36, height: 36)
                         .clipShape(Circle())
-                        .scaleEffect(isShowing ? 1 : 0)
-                        .opacity(isShowing ? 1 : 0)
+                        .scaleEffect(viewModel.isShowing ? 1 : 0)
+                        .opacity(viewModel.isShowing ? 1 : 0)
                     
                     MessageText(
-                        text: message.text,
-                        isCurrentUser: isFromCurrentUser
+                        text: viewModel.message.text,
+                        isCurrentUser: viewModel.isFromCurrentUser
                     )
                     .padding(.trailing, 40)
                 }
@@ -47,17 +52,17 @@ struct MessageView: View {
         .padding(.vertical, 2)
         .modifier(
             SlideInEffect(
-                isShowing: isNewMessage ? isShowing : true,
-                isFromCurrentUser: isFromCurrentUser
+                isShowing: isNewMessage ? viewModel.isShowing : true,
+                isFromCurrentUser: viewModel.isFromCurrentUser
             )
         )
         .onAppear {
             if isNewMessage {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    isShowing = true
+                    viewModel.isShowing = true
                 }
             } else {
-                isShowing = true
+                viewModel.isShowing = true
             }
         }
     }
@@ -67,7 +72,7 @@ struct MessageView: View {
     MessageView(
         message: MOCK_MESSAGE,
         isNewMessage: true,
-        isFromCurrentUser: true
+        currentUser: MOCK_USER
     )
 }
 

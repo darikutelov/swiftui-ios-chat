@@ -13,7 +13,8 @@ struct NewMessageUsersScreen: View {
     @Binding var chatToUser: User?
     let currentUserId: String
     
-    @ObservedObject var viewModel = NewMessageScreenViewModel()
+    @ObservedObject var viewModel = NewMessageScreenViewModel(
+                                        userService: UserService())
     @State var searchText = ""
     @State var isEditing = false
     
@@ -44,6 +45,6 @@ struct NewMessageUsersScreen: View {
         showChatView: .constant(true),
         chatToUser: .constant(MOCK_USER),
         currentUserId: "123",
-        viewModel: NewMessageScreenViewModel()
+        viewModel: NewMessageScreenViewModel(userService: UserService())
     )
 }

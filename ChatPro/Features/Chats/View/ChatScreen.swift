@@ -8,16 +8,20 @@
 import SwiftUI
 
 struct ChatScreen: View {
-    private let chatToUser: User?
-    @ObservedObject var viewModel = ChatViewModel()
+    private let chatPartner: User?
+    private let currentUser: User
+    @ObservedObject var viewModel: ChatScreenViewModel
     @Environment(\.presentationMode) var presentationMode
     
+    //TODO: - Move to viewModel
     @State private var messageText: String = ""
     @State private var selectedImage: UIImage?
-    
-    init(chatToUser: User?) {
-        self.chatToUser = chatToUser
-        //self.viewModel = ChatViewModel(user: user)
+
+    init(chatPartner: User?, currentUser: User) {
+        self.chatPartner = chatPartner
+        self.currentUser = currentUser
+        self._viewModel = ObservedObject(wrappedValue: ChatScreenViewModel(chatPartner: chatPartner,
+                                                                     currentUser: currentUser))
     }
     
     var body: some View {
@@ -31,7 +35,7 @@ struct ChatScreen: View {
                                 MessageView(
                                     message: message,
                                     isNewMessage: message.id == viewModel.newMessageId,
-                                    isFromCurrentUser: true
+                                    currentUser: currentUser
                                 )
                                 .id(message.id)
                             }
@@ -51,7 +55,7 @@ struct ChatScreen: View {
                 .padding()
             }
             //.navigationTitle(user.username)
-            .navigationTitle(chatToUser?.username ?? "Chat View")
+            .navigationTitle(chatPartner?.username ?? "Chat Messages")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .toolbar {
@@ -70,14 +74,17 @@ struct ChatScreen: View {
         }
     }
     
-    func sendMessage() {
-        viewModel.sendMessage(messageText)
+    func sendMessage() async {
+        await viewModel.sendMessage(messageText)
         messageText = ""
     }
 }
 
 #Preview {
     NavigationView {
-        ChatScreen(chatToUser: MOCK_USER)
+        ChatScreen(
+            chatPartner: MOCK_USER,
+            currentUser: MOCK_USER
+        )
     }
 }

@@ -8,9 +8,27 @@
 import UIKit
 import FirebaseFirestore
 
-final class UserService {
+protocol UserServiceProtocol {
+    func fetchUser(withUid uid: String) async throws -> User
+    func fetchUsers() async throws -> [User]
+    func createUser(id: String, username: String, email: String, fullname: String) async throws
+    func saveUser(_ user: User) async throws
+    func uploadUserAvatar(_ image: UIImage, userId: String) async throws
+}
+
+final class UserService: UserServiceProtocol {
     func fetchUser(withUid uid: String) async throws -> User {
         return try await FirestoreConstants.UserCollection.document(uid).getDocument(as: User.self)
+    }
+    
+    func fetchUsers() async throws -> [User] {
+        let snapshot = try await FirestoreConstants.UserCollection.getDocuments()
+        
+        let users = try snapshot.documents.compactMap { document in
+            try document.data(as: User.self)
+        }
+        
+        return users
     }
     
     func createUser(id: String, username: String, email: String, fullname: String) async throws {

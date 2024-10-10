@@ -10,9 +10,10 @@ import SwiftUI
 @MainActor
 final class NewMessageScreenViewModel: ObservableObject {
     @Published var users = [User]()
-    let usersService = UsersService()
+    let userService: UserService
     
-    init() {
+    init(userService: UserService) {
+        self.userService = userService
         Task {
             await fetchUsers()
         }
@@ -20,7 +21,7 @@ final class NewMessageScreenViewModel: ObservableObject {
     
     func fetchUsers() async {
         do {
-            users = try await usersService.fetchUsers()
+            users = try await userService.fetchUsers()
         } catch {
             print(error.localizedDescription)
         }

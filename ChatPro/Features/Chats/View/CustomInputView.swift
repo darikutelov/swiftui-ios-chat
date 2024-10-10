@@ -13,7 +13,7 @@ struct CustomInputView: View {
     @State private var showImagePicker = false
     @State private var image: Image?
     
-    var action: () -> Void
+    var action: () async -> Void
     
     var body: some View {
         VStack {
@@ -68,7 +68,9 @@ struct CustomInputView: View {
                 }
                 
                 Button {
-                    action()
+                    Task {
+                        await action()
+                    }
                 } label: {
                     Text("Send")
                         .bodyText(size: 16, weight: .semibold)

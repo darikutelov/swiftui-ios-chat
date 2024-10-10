@@ -25,12 +25,14 @@ struct ConversationsScreen: View {
                         ForEach(1...15, id: \.self) { _ in
                             // TODO: - Remove Divider from the last cell
                             NavigationLink {
-                                ChatScreen(chatToUser: selectedUser)
+                                ChatScreen(
+                                    chatPartner: selectedUser,
+                                    currentUser: currentUser!
+                                )
                             } label: {
                                 ConversationCell()
                                     .padding(.horizontal)
                             }
-                            
                         }
                     }
                     .padding(.top)
@@ -55,7 +57,10 @@ struct ConversationsScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: $showChatView) {
                 LazyView(
-                    ChatScreen(chatToUser: selectedUser)
+                    ChatScreen(
+                        chatPartner: selectedUser,
+                        currentUser: currentUser!
+                    )
                 )
             }
         }
