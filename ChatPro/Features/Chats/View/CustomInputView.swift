@@ -53,6 +53,9 @@ struct CustomInputView: View {
                         showImagePicker.toggle()
                     } label: {
                         Image(systemName: "photo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28, height: 28)
                             .foregroundColor(.primary)
                             .padding(.trailing, 4)
                     }
@@ -65,20 +68,31 @@ struct CustomInputView: View {
                         .bodyText(size: 16)
                         .frame(minHeight: 30)
                         .foregroundColor(.primary)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
+                        .background {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color(.secondarySystemBackground))
+                        }
+                        .onSubmit {
+                            UIApplication.shared.endEditing()
+                        }
                 }
                 
                 Button {
                     Task {
+                        hideKeyboard()
                         await action()
                     }
                 } label: {
-                    Text("Send")
-                        .bodyText(size: 16, weight: .semibold)
+                    Image(systemName: "paperplane.circle")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 28, height: 28)
                         .foregroundColor(.primary)
                 }
             }
             .padding(.bottom, 8)
-            .padding(.horizontal)
         }
     }
     
@@ -86,10 +100,17 @@ struct CustomInputView: View {
         guard let selectedImage = selectedImage else { return }
         image = Image(uiImage: selectedImage)
     }
+    
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }
 
 #Preview {
-    CustomInputView(inputText: .constant("Type Something"), selectedImage: .constant(nil)) {
+    CustomInputView(
+        inputText: .constant("Type Something"), 
+        selectedImage: .constant(nil)
+    ) {
         
     }
 }

@@ -6,17 +6,18 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct MessageView: View {
-    let isNewMessage: Bool
-    let currentUser: User
-    
     @ObservedObject var viewModel: MessageViewViewModel
     
-    init(message: Message, isNewMessage: Bool, currentUser: User) {
-        self.isNewMessage = isNewMessage
-        self.currentUser = currentUser
-        self._viewModel = ObservedObject(wrappedValue: MessageViewViewModel(message: message, currentUser: currentUser))
+    init(message: Message, currentUser: User?) {
+        self._viewModel = ObservedObject(
+            wrappedValue: MessageViewViewModel(
+                message: message,
+                currentUser: currentUser
+            )
+        )
     }
     
     var body: some View {
@@ -28,50 +29,34 @@ struct MessageView: View {
                     text: viewModel.message.text,
                     isCurrentUser: viewModel.isFromCurrentUser
                 )
-                .padding(.leading, 40)
+                .padding(.leading, K.Space.base * 10)
                 
             } else {
                 HStack(alignment: .bottom) {
-                    Image(.wasp)
+                    KFImage(viewModel.profileImageUrl)
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 36, height: 36)
+                        .frame(width: K.Space.base * 9,
+                               height: K.Space.base * 9)
                         .clipShape(Circle())
-                        .scaleEffect(viewModel.isShowing ? 1 : 0)
-                        .opacity(viewModel.isShowing ? 1 : 0)
+                        .padding(.bottom, 2)
                     
                     MessageText(
                         text: viewModel.message.text,
                         isCurrentUser: viewModel.isFromCurrentUser
                     )
-                    .padding(.trailing, 40)
+                    .padding(.trailing, K.Space.base * 10)
                 }
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 2)
-        .modifier(
-            SlideInEffect(
-                isShowing: isNewMessage ? viewModel.isShowing : true,
-                isFromCurrentUser: viewModel.isFromCurrentUser
-            )
-        )
-        .onAppear {
-            if isNewMessage {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    viewModel.isShowing = true
-                }
-            } else {
-                viewModel.isShowing = true
-            }
-        }
     }
 }
 
 #Preview {
     MessageView(
         message: MOCK_MESSAGE,
-        isNewMessage: true,
         currentUser: MOCK_USER
     )
 }
@@ -82,26 +67,17 @@ struct MessageText: View {
     
     var body: some View {
         Text(text)
-            .padding(12)
+            .padding(K.Space.base * 3)
             .background(
-                isCurrentUser ? Color(.customPrimaryBackground) : Color(.secondarySystemBackground)
+                isCurrentUser ? 
+                Color(.secondarySystemBackground) :
+                Color(.customPrimaryBackground)
             )
-            .bodyText(size: 16)
-            .foregroundStyle(isCurrentUser ? .white : .primary)
+            .bodyText(size: K.Space.base * 4)
+            .foregroundStyle(isCurrentUser ? .primary : Color(.white) )
             .clipShape(
                 ChatBubble(isFromCurrentUser: isCurrentUser)
             )
     }
 }
 
-struct SlideInEffect: ViewModifier {
-    let isShowing: Bool
-    let isFromCurrentUser: Bool
-    
-    func body(content: Content) -> some View {
-        content
-            .offset(x: isShowing ? 0 : (isFromCurrentUser ? 100 : -100))
-            .opacity(isShowing ? 1 : 0)
-            .scaleEffect(isShowing ? 1 : 0.8, anchor: isFromCurrentUser ? .trailing : .leading)
-    }
-}

@@ -11,8 +11,10 @@ struct StyledButton: View {
     let text: String
     var isLoading: Bool = false
     var formIsValid: Bool = true
-    let action: () -> Void
+    var disabled: Bool = false
     
+    let action: () -> Void
+
     var body: some View {
         Button {
             action()
@@ -37,7 +39,7 @@ struct StyledButton: View {
             radius: 5,
             x: 0.0, y: 0.0
         )
-        .disabled(isLoading)
+        .disabled(isLoading || disabled)
     }
 }
 

@@ -9,19 +9,26 @@ import SwiftUI
 
 struct ChatScreen: View {
     private let chatPartner: User?
-    private let currentUser: User
+    private let currentUser: User?
+    private let messageService: MessageService
     @ObservedObject var viewModel: ChatScreenViewModel
     @Environment(\.presentationMode) var presentationMode
     
     //TODO: - Move to viewModel
-    @State private var messageText: String = ""
     @State private var selectedImage: UIImage?
 
-    init(chatPartner: User?, currentUser: User) {
+    init(chatPartner: User?, currentUser: User?, messageService: MessageService) {
         self.chatPartner = chatPartner
         self.currentUser = currentUser
-        self._viewModel = ObservedObject(wrappedValue: ChatScreenViewModel(chatPartner: chatPartner,
-                                                                     currentUser: currentUser))
+        self.messageService = messageService
+        
+        self._viewModel = ObservedObject(
+            wrappedValue: ChatScreenViewModel(
+                chatPartner: chatPartner,
+                currentUser: currentUser,
+                messageService: messageService
+            )
+        )
     }
     
     var body: some View {
@@ -30,37 +37,33 @@ struct ChatScreen: View {
                 // Messages
                 ScrollViewReader { value in
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 12) {
+                        VStack(alignment: .leading,
+                               spacing: K.Space.base * 3) {
                             ForEach(viewModel.messages) { message in
                                 MessageView(
                                     message: message,
-                                    isNewMessage: message.id == viewModel.newMessageId,
                                     currentUser: currentUser
                                 )
                                 .id(message.id)
                             }
                         }.padding(.top)
                     }
-                    .onChange(of: viewModel.newMessageId) { _, id in
-                        withAnimation {
-                            proxy.scrollTo(id, anchor: .bottom)
-                        }
-                    }
+                    .onReceive(
+                        viewModel.$messageToSetVisible,
+                        perform: { id in value.scrollTo(id) }
+                    )
                 }
                 
-                // Input View
-                CustomInputView(inputText: $messageText,
+                CustomInputView(inputText: $viewModel.messageText,
                                 selectedImage: $selectedImage,
                                 action: sendMessage)
                 .padding()
             }
-            //.navigationTitle(user.username)
             .navigationTitle(chatPartner?.username ?? "Chat Messages")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    // Custom back button
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
                     }) {
@@ -75,8 +78,8 @@ struct ChatScreen: View {
     }
     
     func sendMessage() async {
-        await viewModel.sendMessage(messageText)
-        messageText = ""
+        await viewModel.sendMessage()
+        viewModel.messageText = ""
     }
 }
 
@@ -84,7 +87,8 @@ struct ChatScreen: View {
     NavigationView {
         ChatScreen(
             chatPartner: MOCK_USER,
-            currentUser: MOCK_USER
+            currentUser: MOCK_USER,
+            messageService: MessageService()
         )
     }
 }

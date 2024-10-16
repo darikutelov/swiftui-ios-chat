@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 protocol UserServiceProtocol {
     func fetchUser(withUid uid: String) async throws -> User
-    func fetchUsers() async throws -> [User]
+    func fetchUsers(currentUserUid: String) async throws -> [User]
     func createUser(id: String, username: String, email: String, fullname: String) async throws
     func saveUser(_ user: User) async throws
     func uploadUserAvatar(_ image: UIImage, userId: String) async throws
@@ -21,13 +21,15 @@ final class UserService: UserServiceProtocol {
         return try await FirestoreConstants.UserCollection.document(uid).getDocument(as: User.self)
     }
     
-    func fetchUsers() async throws -> [User] {
-        let snapshot = try await FirestoreConstants.UserCollection.getDocuments()
+    func fetchUsers(currentUserUid: String) async throws -> [User] {
+        let snapshot = try await Firestore.firestore()
+            .collection("users")
+            .whereField("id", isNotEqualTo: currentUserUid)
+            .getDocuments()
         
         let users = try snapshot.documents.compactMap { document in
             try document.data(as: User.self)
         }
-        
         return users
     }
     
@@ -66,7 +68,7 @@ final class UserService: UserServiceProtocol {
     
     func uploadUserAvatar(_ image: UIImage, userId: String) async throws {
         do {
-            let profileImageUrl = try await ImageUploader.uploadImage(image: image, folderName: "avatars")
+            let profileImageUrl = try await ImageUploader.uploadImage(image: image, type: .profile)
             try await FirestoreConstants.UserCollection.document(userId).updateData(["profileImageUrl": profileImageUrl])
         } catch {
             print("DEBUG: Profile image failed \(error.localizedDescription)")

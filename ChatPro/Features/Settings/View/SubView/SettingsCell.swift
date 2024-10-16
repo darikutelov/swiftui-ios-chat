@@ -60,5 +60,8 @@ struct SettingsCell: View {
 }
 
 #Preview {
-    SettingsCell(viewModel: SettingsCellViewModel.starredMessage, isLast: false)
+    SettingsCell(
+        viewModel: SettingsCellViewModel.starredMessage,
+        isLast: false
+    )
 }

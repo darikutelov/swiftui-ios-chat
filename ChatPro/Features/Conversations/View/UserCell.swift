@@ -16,7 +16,8 @@ struct UserCell: View {
             KFImage(URL(string: user.profileImageUrl ?? ""))
                 .resizable()
                 .scaledToFill()
-                .frame(width: 48, height: 48)
+                .frame(width: K.Space.base * 12,
+                       height: K.Space.base * 12)
                 .clipShape(Circle())
             
             VStack(alignment: .leading) {

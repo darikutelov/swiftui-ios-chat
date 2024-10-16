@@ -8,12 +8,13 @@
 import SwiftUI
 
 @MainActor
-final class NewMessageScreenViewModel: ObservableObject {
+final class SelectChatPartnerScreenViewModel: ObservableObject {
     @Published var users = [User]()
-    let userService: UserService
+    private let userManager: UserManager
     
-    init(userService: UserService) {
-        self.userService = userService
+    init(userManager: UserManager) {
+        self.userManager = userManager
+        
         Task {
             await fetchUsers()
         }
@@ -21,7 +22,7 @@ final class NewMessageScreenViewModel: ObservableObject {
     
     func fetchUsers() async {
         do {
-            users = try await userService.fetchUsers()
+            self.users = try await userManager.fetchUsers()
         } catch {
             print(error.localizedDescription)
         }

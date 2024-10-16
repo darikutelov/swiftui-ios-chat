@@ -16,15 +16,10 @@ struct MainView: View {
             userService: UserService()
         )
     }
-
+    
     var body: some View {
-        Group {
-            if userManager.currentUser == nil {
-                LoginView(userManager: userManager)
-            } else {
-                MainTabView(userManager: userManager)
-            }
-        }
+        MainTabView(userManager: userManager)
+            .requiresAuthentication(userManager: userManager)
     }
 }
 

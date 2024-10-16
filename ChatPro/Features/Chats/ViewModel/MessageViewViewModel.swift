@@ -9,15 +9,19 @@ import Foundation
 
 final class MessageViewViewModel: ObservableObject {
     let message: Message
-    let currentUser: User
-    @Published var isShowing = false
+    let currentUser: User?
     
-    var isFromCurrentUser: Bool {
-        message.fromId == currentUser.id
-    }
-    
-    init(message: Message, currentUser: User) {
+    init(message: Message, currentUser: User?) {
         self.message = message
         self.currentUser = currentUser
+    }
+    
+    var isFromCurrentUser: Bool {
+        message.fromId == currentUser?.id
+    }
+    
+    var profileImageUrl: URL? {
+        guard let profileImageUrl = message.user?.profileImageUrl else { return nil }
+        return URL(string: profileImageUrl)
     }
 }

@@ -16,4 +16,11 @@ extension View {
         self.modifier(BodyText(size: size, weight: weight))
     }
 
+    func requiresAuthentication(userManager: UserManager) -> some View {
+        self.modifier(RequiresAuthentication(userManager: userManager))
+    }
+    
+    func roundedImage() -> some View {
+        self.modifier(RoundedImage())
+    }
 }

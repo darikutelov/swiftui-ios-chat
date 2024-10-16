@@ -6,14 +6,43 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct ConversationCell: View {
-    //let viewModel: MessageViewModel
+    let viewModel: ConversationCellViewModel
+    let currentUser: User?
+    let messageService: MessageService
+    
+    var body: some View {
+        if let chatPartner = viewModel.message.user {
+            NavigationLink {
+                ChatScreen(
+                    chatPartner: chatPartner,
+                    currentUser: currentUser,
+                    messageService: messageService
+                )
+            } label: {
+                ConversaionCellView(viewModel: viewModel)
+            }
+        }
+    }
+}
+
+#Preview {
+    ConversationCell(
+        viewModel: ConversationCellViewModel(message: MOCK_MESSAGE),
+        currentUser: MOCK_USER,
+        messageService: MessageService()
+    )
+}
+
+struct ConversaionCellView: View {
+    let viewModel: ConversationCellViewModel
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack(spacing: 12) {
-                Image("colin")
+                KFImage(viewModel.chatPartnerImageUrl)
                     .resizable()
                     .scaledToFill()
                     .clipped()
@@ -21,22 +50,21 @@ struct ConversationCell: View {
                     .cornerRadius(28)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Test User")
+                    Text(viewModel.chatPartnerFullname)
                         .bodyText(weight: .semibold)
                     
-                    Text("This is a test message. ")
+                    Text(viewModel.message.text)
                         .bodyText(size: 15)
                         .lineLimit(2)
+                        .multilineTextAlignment(.leading)
                         .minimumScaleFactor(0.75)
                 }
                 .foregroundColor(.primary)
+                
+                Spacer()
             }
             
             Divider()
         }
     }
-}
-
-#Preview {
-    ConversationCell()
 }

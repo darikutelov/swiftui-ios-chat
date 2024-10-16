@@ -47,3 +47,12 @@ enum CustomFontWeight {
         }
     }
 }
+
+struct RoundedImage: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .frame(width: 64, height: 64)
+            .clipShape(Circle())
+    }
+}
+

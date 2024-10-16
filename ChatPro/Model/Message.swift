@@ -8,13 +8,23 @@
 import Foundation
 import FirebaseFirestore
 
-struct Message: Identifiable, Hashable, Decodable {
+struct Message: Identifiable, Codable, Equatable {
+    static func == (lhs: Message, rhs: Message) -> Bool {
+        lhs.timestamp.nanoseconds >= rhs.timestamp.nanoseconds
+    }
+    
     @DocumentID var id: String?
     let fromId: String
     let toId: String
     var read: Bool
     let text: String
     let timestamp: Timestamp
+    
+    var user: User?
+    
+    var encodedMessage: [String: Any] {
+        return (try? Firestore.Encoder().encode(self)) ?? [:]
+    }
     
     enum CodingKeys: String, CodingKey {
         case id
