@@ -16,13 +16,14 @@ struct T {
         static let xmark = "xmark"
         static let trayFill = "tray.fill"
         static let photoInFrame = "photo.artframe.circle"
+        static let back = "chevron.left"
     }
     
     struct Titles {
         static let chats = "Chats"
-        static let channels = "Channels"
+        static let channels = "Group Chats"
         static let settings = "Settings"
-        static let newRoom = "New Room"
+        static let newRoom = "New Group Chat"
     }
     
     struct ButtonText {
@@ -32,7 +33,6 @@ struct T {
     }
     
     struct Rooms {
-        static let enterMessage = "Enter a name for the new room"
-        static let instructionMessage = "Please provide a room name and icon"
+        static let enterMessage = "Enter a name for the new group chat"
     }
 }

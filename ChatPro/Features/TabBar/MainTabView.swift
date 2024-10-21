@@ -30,7 +30,7 @@ extension AppTabs {
         case .conversations:
             Label("Chats", systemImage: "bubble.left")
         case .channels:
-            Label("Rooms", systemImage: "bubble.left.and.bubble.right")
+            Label("Group Chats", systemImage: "bubble.left.and.bubble.right")
         case .settings:
             Label("Settings", systemImage: "gear")
         }

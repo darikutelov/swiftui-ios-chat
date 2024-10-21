@@ -37,7 +37,7 @@ struct CreateChannelScreen: View {
     }
     
     var inputValid: Bool {
-        !channelName.isEmpty && channelImage != nil
+        !channelName.isEmpty
     }
     
     var body: some View {

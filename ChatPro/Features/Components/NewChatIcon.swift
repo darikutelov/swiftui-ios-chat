@@ -21,7 +21,7 @@ struct NewChatIcon: View {
                 .padding(K.Space.base)
                 .offset(x: -K.Space.base/2, y: -K.Space.base/4)
         }
-        .background(Color(.customPrimaryBackground))
+        .background(Color(.customSecondary))
         .foregroundColor(.white)
         .clipShape(Circle())
         .padding()

@@ -7,14 +7,9 @@
 
 import Foundation
 
-final class MessageViewViewModel: ObservableObject {
+struct MessageViewViewModel {
     let message: Message
     let currentUser: User?
-    
-    init(message: Message, currentUser: User?) {
-        self.message = message
-        self.currentUser = currentUser
-    }
     
     var isFromCurrentUser: Bool {
         message.fromId == currentUser?.id

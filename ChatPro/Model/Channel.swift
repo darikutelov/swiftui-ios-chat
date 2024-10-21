@@ -20,4 +20,4 @@ struct Channel: Identifiable, Codable, Equatable {
 }
 
 
-let MOCK_CHANNEL = Channel(id: "123", name: "Test Channel", imageUrl: "https://cdn.britannica.com/65/137465-050-0A58A7AB/Sade-album-cover-Soldier-of-Love.jpg", uids: ["123", "123"], lastMessage: "Hi, there")
+let MOCK_CHANNEL = Channel(id: "123", name: "Test Channel", imageUrl: nil, uids: ["123", "123"], lastMessage: "Hi, there")

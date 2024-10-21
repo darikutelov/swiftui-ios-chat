@@ -52,14 +52,16 @@ struct ConversaionCellView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(viewModel.chatPartnerFullname)
                         .bodyText(weight: .semibold)
+                        .foregroundStyle(.custom1)
                     
                     Text(viewModel.message.text)
                         .bodyText(size: 15)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                         .minimumScaleFactor(0.75)
+                        .foregroundColor(.customTerciary)
                 }
-                .foregroundColor(.primary)
+                
                 
                 Spacer()
             }

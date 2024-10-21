@@ -34,7 +34,6 @@ struct ChatScreen: View {
     var body: some View {
         ScrollViewReader { proxy in
             VStack {
-                // Messages
                 ScrollViewReader { value in
                     ScrollView {
                         VStack(alignment: .leading,

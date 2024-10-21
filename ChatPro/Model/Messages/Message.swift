@@ -48,5 +48,5 @@ struct Message: Identifiable, Codable, Equatable {
 let MOCK_MESSAGE = Message(fromId: "Em7beCNP9EOPjpXoyk1HZ6mNOT33",
                            toId: "FOWOuSVFnOXAtAXAJ62Q0SduR6i2",
                            read: false,
-                           text: "Hi, there",
+                           text: "Hi, there. How are you? Nice to talk to you. I feel awesome!",
                            timestamp: Timestamp(date: Date()))

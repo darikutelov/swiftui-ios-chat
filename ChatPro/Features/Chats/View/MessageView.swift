@@ -9,14 +9,12 @@ import SwiftUI
 import Kingfisher
 
 struct MessageView: View {
-    @ObservedObject var viewModel: MessageViewViewModel
+    private let viewModel: MessageViewViewModel
     
     init(message: Message, currentUser: User?) {
-        self._viewModel = ObservedObject(
-            wrappedValue: MessageViewViewModel(
-                message: message,
-                currentUser: currentUser
-            )
+        self.viewModel = MessageViewViewModel(
+            message: message,
+            currentUser: currentUser
         )
     }
     
@@ -70,8 +68,18 @@ struct MessageText: View {
             .padding(K.Space.base * 3)
             .background(
                 isCurrentUser ? 
-                Color(.secondarySystemBackground) :
-                Color(.customPrimaryBackground)
+                RadialGradient(
+                    gradient: Gradient(colors: [Color(.secondarySystemBackground), Color(.secondarySystemBackground)]),
+                    center: .center,
+                    startRadius: 20,
+                    endRadius: 200
+                ) :
+                RadialGradient(
+                    gradient: Gradient(colors: [.customPrimary, .radient2]),
+                    center: .center,
+                    startRadius: 70,
+                    endRadius: 200
+                )
             )
             .bodyText(size: K.Space.base * 4)
             .foregroundStyle(isCurrentUser ? .primary : Color(.white) )
