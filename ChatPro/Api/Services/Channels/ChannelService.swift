@@ -11,8 +11,10 @@ import FirebaseFirestore
 protocol ChannelServiceProtocol {
     var currentUser: User? { get set }
     var channel: Channel? { get set }
-    func createChannel(channel: Channel) async throws -> Void
-    //func fetchChannels() async throws -> [Channel]?
+//    func fetchChannels(
+//        isInitialFetch: Bool,
+//        completion: @escaping (Result<[Channel], Error>) -> Void)
+    func createChannel(channel: Channel) async throws -> String?
     func saveChannelMessage(message: ChannelMessage) async throws -> String
     func updateLastMessage(text: String) async throws -> Void
 }
@@ -20,6 +22,11 @@ protocol ChannelServiceProtocol {
 final class ChannelService: ChannelServiceProtocol {
     var currentUser: User?
     var channel: Channel?
+    private var lastDocument: DocumentSnapshot?
+    private var isFetchingMore = false
+    private var hasMoreChannels = true
+    private let pageSize = 15
+    private var listener: ListenerRegistration?
     
     init(currentUser: User? = nil, channel: Channel? = nil) {
         self.currentUser = currentUser
@@ -30,12 +37,14 @@ final class ChannelService: ChannelServiceProtocol {
         FirestoreConstants.ChannelsCollection
     }
     
-    func createChannel(channel: Channel) async throws -> Void {
+    func createChannel(channel: Channel) async throws -> String? {
         let channelRef = collectionRef.document()
+        let channelId = channelRef.documentID
         
         do {
             try await channelRef.setData(channel.encodedChannel)
             self.channel = channel
+            return channelId
         } catch {
             print(error.localizedDescription)
             throw error
@@ -54,48 +63,6 @@ final class ChannelService: ChannelServiceProtocol {
         } catch {
             print("Error deleting channel: \(error.localizedDescription)")
             throw error
-        }
-    }
-    
-//    func fetchChannels() async throws -> [Channel]? {
-//        guard let currentUserId = currentUser?.id else { return nil }
-//        do {
-//            let snapshot = try await collectionRef
-//                .whereField("uids", arrayContains: currentUserId)
-//                .getDocuments()
-//            
-//            return snapshot.documents
-//                .compactMap { try? $0.data(as: Channel.self) }
-//            
-//        } catch {
-//            print(error.localizedDescription)
-//            throw error
-//        }
-//    }
-    
-    func fetchChannels(
-        completion: @escaping (Result<[Channel], Error>) -> Void
-    ) {
-        guard let currentUserId = currentUser?.id else { return }
-        print("DEBUG - User id: \(currentUserId)")
-        let query =  collectionRef
-            .whereField("uids", arrayContains: currentUserId)
-//            .order(by: "timestamp", descending: false)
-        
-        query.addSnapshotListener { querySnapshot, error in
-            guard let documents = querySnapshot?.documents else {
-                print(
-                    "Error fetching channels for group chat: \(error?.localizedDescription ?? "Unknown error")"
-                )
-                completion(.failure(error ?? NSError()))
-                return
-            }
-
-            let channels = documents.compactMap { document -> Channel? in
-                try? document.data(as: Channel.self)
-            }
-            print("DEBUG - Channels: \(channels)")
-            completion(.success(channels))
         }
     }
     
@@ -128,7 +95,9 @@ final class ChannelService: ChannelServiceProtocol {
         let channelRef = collectionRef.document(channelId)
         
         do {
-            try await channelRef.updateData(["lastMessage": text])
+            try await channelRef.updateData(
+                ["lastMessage": text, "updatedAt": Timestamp(date: Date())]
+            )
         } catch {
             print(error.localizedDescription)
             throw error

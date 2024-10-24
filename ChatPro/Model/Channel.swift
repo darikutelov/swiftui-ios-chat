@@ -13,6 +13,7 @@ struct Channel: Identifiable, Codable, Equatable {
     var imageUrl: String?
     var uids: [String]
     var lastMessage: String
+    var updatedAt: Timestamp
     
     var encodedChannel: [String: Any] {
         return (try? Firestore.Encoder().encode(self)) ?? [:]
@@ -20,4 +21,11 @@ struct Channel: Identifiable, Codable, Equatable {
 }
 
 
-let MOCK_CHANNEL = Channel(id: "123", name: "Test Channel", imageUrl: nil, uids: ["123", "123"], lastMessage: "Hi, there")
+let MOCK_CHANNEL = Channel(
+    id: "123",
+    name: "Test Channel",
+    imageUrl: nil,
+    uids: ["123", "123"],
+    lastMessage: "Hi, there",
+    updatedAt: Timestamp(date: Date())
+)

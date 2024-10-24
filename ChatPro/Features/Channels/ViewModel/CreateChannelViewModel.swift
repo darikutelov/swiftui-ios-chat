@@ -6,14 +6,15 @@
 //
 
 import SwiftUI
+import Firebase
 
 @MainActor
 final class CreateChannelViewModel: ObservableObject {
     let users: [User]
     private let currentUser: User?
     private let channelService: ChannelService
-    
-    @Published var didCrateChannel = false
+        
+    @Published var didCreateChannel = 0
     @Published var isSaving = false
     
     init(users: [User], currentUser: User?, channelService: ChannelService) {
@@ -22,9 +23,9 @@ final class CreateChannelViewModel: ObservableObject {
         self.channelService = channelService
     }
     
-    func createChannel(name: String, image: UIImage?) async {
+    func createChannel(name: String, image: UIImage?) async -> String? {
         guard let currentUserId = currentUser?.id,
-              let currentUserFullname = currentUser?.fullname else { return }
+              let currentUserFullname = currentUser?.fullname else { return nil }
         
         var uids = users.map({ $0.id ?? NSUUID().uuidString })
         uids.append(currentUserId)
@@ -32,7 +33,8 @@ final class CreateChannelViewModel: ObservableObject {
         var channel = Channel(
             name: name,
             uids: uids,
-            lastMessage: "\(currentUserFullname) created a channel"
+            lastMessage: "\(currentUserFullname) created a channel",
+            updatedAt: Timestamp(date: Date())
         )
         
         isSaving = true
@@ -45,20 +47,23 @@ final class CreateChannelViewModel: ObservableObject {
                 isSaving = false
                 print(error.localizedDescription)
             }
-            await saveNewChannel(channel: channel)
+            return await saveNewChannel(channel: channel)
         } else {
-            await saveNewChannel(channel: channel)
+            return await saveNewChannel(channel: channel)
         }
     }
     
-    private func saveNewChannel(channel: Channel) async {
+    private func saveNewChannel(channel: Channel) async -> String? {
         do {
-            try await channelService.createChannel(channel: channel)
+            let channelId = try await channelService.createChannel(channel: channel)
             isSaving = false
-            self.didCrateChannel = true
+            self.didCreateChannel = 1
+            return channelId
         } catch {
             isSaving = false
+            self.didCreateChannel = 2
             print(error.localizedDescription)
+            return nil
         }
     }
 }

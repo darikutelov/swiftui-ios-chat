@@ -12,4 +12,8 @@ extension Array {
         guard let lastItem = self.last else { return false }
         return item == lastItem
     }
+    
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
+    }
 }

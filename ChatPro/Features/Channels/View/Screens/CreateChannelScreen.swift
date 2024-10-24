@@ -10,6 +10,7 @@ import SwiftUI
 struct CreateChannelScreen: View {
     @Environment(\.presentationMode ) private var mode
     @Binding var show: Bool
+    @Binding var channelToSetVisible: String?
     let currentUser: User?
     let channelService: ChannelService
     
@@ -23,10 +24,12 @@ struct CreateChannelScreen: View {
     init(
         users: [User],
         show: Binding<Bool>,
+        channelToSetVisible: Binding<String?>,
         currentUser: User?,
         channelService: ChannelService
     ) {
         self._show = show
+        self._channelToSetVisible = channelToSetVisible
         self.currentUser = currentUser
         self.channelService = channelService
         self.viewModel = CreateChannelViewModel(
@@ -57,7 +60,7 @@ struct CreateChannelScreen: View {
                 }
                 .sheet(
                     isPresented: $showImagePicker,
-                    onDismiss: loadImage, 
+                    onDismiss: loadImage,
                     content: {
                         ImagePicker(image: $selectedImage)
                     }
@@ -78,26 +81,28 @@ struct CreateChannelScreen: View {
             .padding()
             
             Spacer()
-  
+            
             StyledButton(
                 text: T.ButtonText.create,
                 isLoading: viewModel.isSaving,
                 disabled: !inputValid
             ) {
                 Task {
-                    await viewModel.createChannel(
+                    let newChannelId = await viewModel.createChannel(
                         name: channelName,
                         image: selectedImage
                     )
+                    if let channelId = newChannelId {
+                        self.channelToSetVisible = channelId
+                    }
+                    mode.wrappedValue.dismiss()
+                    show.toggle()
                 }
             }
         }
-        .onReceive(viewModel.$didCrateChannel, perform: { completed in
-            if completed {
-                mode.wrappedValue.dismiss()
-                show.toggle()
-            }
-        })
+        .onChange(of: viewModel.didCreateChannel) { oldValue, newValue in
+            print("DEBUG: \(oldValue), \(newValue)")
+        }
     }
     
     func loadImage() {
@@ -110,6 +115,7 @@ struct CreateChannelScreen: View {
     CreateChannelScreen(
         users: [],
         show: .constant(false),
+        channelToSetVisible: .constant("123"),
         currentUser: MOCK_USER,
         channelService: ChannelService()
     )

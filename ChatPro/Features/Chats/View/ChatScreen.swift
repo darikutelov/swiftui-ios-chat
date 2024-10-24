@@ -37,7 +37,7 @@ struct ChatScreen: View {
                 ScrollViewReader { value in
                     ScrollView {
                         VStack(alignment: .leading,
-                               spacing: K.Space.base * 3) {
+                               spacing: K.Space.base) {
                             ForEach(viewModel.messages) { message in
                                 MessageView(
                                     message: message,
@@ -47,10 +47,11 @@ struct ChatScreen: View {
                             }
                         }.padding(.top)
                     }
-                    .onReceive(
-                        viewModel.$messageToSetVisible,
-                        perform: { id in value.scrollTo(id) }
-                    )
+                    .defaultScrollAnchor(.bottom)
+//                    .onReceive(
+//                        viewModel.$messageToSetVisible,
+//                        perform: { id in value.scrollTo(id) }
+//                    )
                 }
                 
                 CustomInputView(inputText: $viewModel.messageText,

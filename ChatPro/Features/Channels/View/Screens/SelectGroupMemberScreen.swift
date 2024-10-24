@@ -10,6 +10,7 @@ import SwiftUI
 struct SelectGroupMemberScreen: View {
     @Environment(\.presentationMode) var mode
     @Binding var show: Bool
+    @Binding var channelToSetVisible: String?
     let channelService: ChannelService
     let currentUser: User?
     
@@ -20,10 +21,12 @@ struct SelectGroupMemberScreen: View {
     
     init(users: Binding<[SelectableUser]>,
          show: Binding<Bool>,
+         channelToSetVisible: Binding<String?>,
          userManager: UserManager,
          channelService: ChannelService
     ) {
         self._show = show
+        self._channelToSetVisible = channelToSetVisible
         self.channelService = channelService
         self.currentUser = userManager.currentUser
         self._viewModel = ObservedObject(
@@ -72,6 +75,7 @@ struct SelectGroupMemberScreen: View {
                 CreateChannelScreen(
                     users: viewModel.selectedUsers.map { $0.user },
                     show: $show,
+                    channelToSetVisible: $channelToSetVisible,
                     currentUser: currentUser,
                     channelService: channelService
                 )
@@ -120,6 +124,7 @@ struct SelectGroupMemberScreen: View {
     SelectGroupMemberScreen(
         users: .constant([SelectableUser(user: MOCK_USER, isSelected: true)]),
         show: .constant(false),
+        channelToSetVisible: .constant("123"),
         userManager: UserManager(
             authService: AuthService(),
             userService: UserService()

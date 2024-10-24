@@ -11,31 +11,14 @@ final class ChannelScreenViewModel: ObservableObject {
     let channelService: ChannelService
     let currentUser: User?
     
-    @Published var channels: [Channel] = [] //[MOCK_CHANNEL, MOCK_CHANNEL, MOCK_CHANNEL]
+    @Published var channels: [Channel] = []// [MOCK_CHANNEL, MOCK_CHANNEL, MOCK_CHANNEL]
     @Published var isShowingNewMessageView = false
     @Published var showChatView = false
     @Published var isLoading = false
+    @Published var channelToSetVisible: String?
     
     init(channelService: ChannelService, currentUser: User?) {
         self.channelService = channelService
         self.currentUser = currentUser
-        fetchChannels()
-    }
-    
-    // TODO: - channels pagination
-    // TODO: - show error
-    private func fetchChannels() {
-        isLoading = true
-        
-        channelService.fetchChannels { result in
-            switch result {
-            case .success(let channels):
-                self.isLoading = false
-                self.channels = channels
-            case .failure(let error):
-                print("Error fetching messages with users: \(error.localizedDescription)")
-                self.isLoading = false
-            }
-        }
     }
 }

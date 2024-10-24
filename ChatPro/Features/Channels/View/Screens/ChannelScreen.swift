@@ -10,15 +10,20 @@ import SwiftUI
 struct ChannelScreen: View {
     @ObservedObject var userManager: UserManager
     @ObservedObject var viewModel: ChannelScreenViewModel
+    @ObservedObject var channelsService: ChannelsService
     
     @State var users = [SelectableUser]()
     let channelService: ChannelService
     
     init(userManager: UserManager) {
+        self.userManager = userManager
         let channelService = ChannelService(
             currentUser: userManager.currentUser
         )
-        self.userManager = userManager
+        self._channelsService = ObservedObject(wrappedValue: ChannelsService(
+            currentUser: userManager.currentUser
+        ))
+        
         self.viewModel = ChannelScreenViewModel(
             channelService: channelService,
             currentUser: userManager.currentUser
@@ -29,28 +34,45 @@ struct ChannelScreen: View {
     var body: some View {
         NavigationStack() {
             VStack {
-                if viewModel.isLoading {
+                if channelsService.isLoading {
                     ProgressView()
-                } else if viewModel.channels.isEmpty {
+                } else if channelsService.channels.isEmpty {
                     CustomContentUnavailableView(
                         title: "No Group Chats",
                         description: "Start A New Group Chat"
                     )
                 } else {
-                    // TODO: - go to last channel
-                    ScrollView {
-                        VStack(alignment: .leading) {
-                            ForEach(viewModel.channels) { channel in
-                                ChannelCell(
-                                    channel: channel,
-                                    channelService: channelService
-                                )
+                    ZStack {
+                        ScrollViewReader { value in
+                            ScrollView {
+                                LazyVStack(alignment: .leading) {
+                                    ForEach(channelsService.channels) { channel in
+                                        ChannelCell(
+                                            channel: channel,
+                                            channelService: channelService
+                                        )
+                                        .id(channel.id)
+                                        .onAppear {
+                                            //let _ = print("item \(String(describing: channel.id)) appeared")
+                                            if channel.id == channelsService.channels[safe: 2]?.id {
+                                                channelsService.fetchChannels(
+                                                    isInitialFetch: false
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal)
+                                .padding(.top)
                             }
+                            .defaultScrollAnchor(.bottom)
+                            .scrollIndicators(.hidden, axes: .vertical)
+                            .onReceive(
+                                viewModel.$channelToSetVisible,
+                                perform: { id in value.scrollTo(id) }
+                            )
                         }
-                        .padding(.horizontal)
-                        .padding(.top)
                     }
-                    .scrollIndicators(.hidden, axes: .vertical)
                 }
             }
             .sheet(
@@ -59,6 +81,7 @@ struct ChannelScreen: View {
                     SelectGroupMemberScreen(
                         users: $users,
                         show: $viewModel.isShowingNewMessageView,
+                        channelToSetVisible: $viewModel.channelToSetVisible,
                         userManager: userManager,
                         channelService: channelService
                     )
@@ -92,6 +115,18 @@ struct ChannelScreen: View {
                 }
             }
         }
+        .onReceive(channelsService.$channels) { _ in
+            self.viewModel.channelToSetVisible = channelsService.channels.last?.id
+        }
+        .refreshable {
+            channelsService.fetchChannels(isInitialFetch: true)
+        }
+        .onAppear {
+            channelsService.fetchChannels(isInitialFetch: true)
+        }
+        .onDisappear {
+            channelsService.cleanup()
+        }
     }
 }
 
@@ -100,4 +135,16 @@ struct ChannelScreen: View {
         userManager: UserManager(authService: AuthService(),
                                  userService: UserService())
     )
+}
+
+struct BlurView: UIViewRepresentable {
+    let style: UIBlurEffect.Style
+    
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        return UIVisualEffectView(effect: UIBlurEffect(style: style))
+    }
+    
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        uiView.effect = UIBlurEffect(style: style)
+    }
 }
